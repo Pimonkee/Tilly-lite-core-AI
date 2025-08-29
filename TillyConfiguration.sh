@@ -1,0 +1,6 @@
+# Tilly Configuration
+GEMINI_API_KEY=your_gemini_api_key_here
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
+RASA_ENDPOINT=http://localhost:5005
+TILLY_ENV=development
+LOG_LEVEL=INFO
