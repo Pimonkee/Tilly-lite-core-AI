@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilly AI - Your Empathetic Companion</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New Chat
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <div class="chat-history" id="chatHistory">
+                    <!-- Chat history items will be inserted here -->
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar-small">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
+                    </div>
+                    <span>Guest User</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <div class="chat-header">
+                <h1>
+                    <span class="logo">🤖</span>
+                    Tilly AI
+                </h1>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Online</span>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <!-- Welcome Message -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="avatar-large">
+                        <img src="/static/images/avatar.svg" alt="Tilly Avatar" id="avatarImage">
+                    </div>
+                    <h2>Hello! I'm Tilly 💜</h2>
+                    <p>Your empathetic AI companion focused on mental wellness and genuine human connection.</p>
+                    <div class="suggestions">
+                        <h3>Try asking me about:</h3>
+                        <div class="suggestion-cards">
+                            <button class="suggestion-card" data-suggestion="I'm feeling anxious today">
+                                <span class="emoji">😟</span>
+                                <span>I'm feeling anxious</span>
+                            </button>
+                            <button class="suggestion-card" data-suggestion="Tell me something to make me smile">
+                                <span class="emoji">😊</span>
+                                <span>Make me smile</span>
+                            </button>
+                            <button class="suggestion-card" data-suggestion="How can I manage stress better?">
+                                <span class="emoji">🧘</span>
+                                <span>Managing stress</span>
+                            </button>
+                            <button class="suggestion-card" data-suggestion="Just want to chat">
+                                <span class="emoji">💬</span>
+                                <span>Casual chat</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages will be inserted here -->
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Message Tilly..." 
+                        rows="1"
+                        autocomplete="off"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <small>Tilly is here to listen and support you. If you're in crisis, please reach out to emergency services.</small>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

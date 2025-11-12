@@ -2,16 +2,23 @@
 Tilly FastAPI Application - The Web Interface
 Bringing Tilly to the world through a beautiful API!
 """
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import Optional
 import logging
 from pathlib import Path
-from tilly_intelligence_pipeline import TillyPipeline
-from tilly_configuration_manager3 import get_config
-from tilly_path_management import DATA_ROOT, get_log_path, ensure_data_dirs
-from ocr import process_image, remember_text, memory, batch_process_folder
-from ollama_client import generate_with_ollama
+import os
+from src.tilly.core.tilly_intelligence_pipeline import TillyPipeline
+from src.tilly.config.configuration_manager import get_config
+from src.tilly.config.tilly_path_management import DATA_ROOT, get_log_path, ensure_data_dirs
+from src.tilly.utils.ocr import process_image, remember_text, memory, batch_process_folder
+from src.tilly.utils.ollama_client import generate_with_ollama
+
+# Get the project root directory
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 # Initialize FastAPI app early so decorators bind to the correct instance
 app = FastAPI(
@@ -19,6 +26,10 @@ app = FastAPI(
     description="An empathetic AI companion focused on mental wellness and genuine human connection",
     version="1.0.0"
 )
+
+# Mount static files and templates
+app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "static")), name="static")
+templates = Jinja2Templates(directory=str(PROJECT_ROOT / "templates"))
 
 @app.get("/ollama/fibonacci")
 async def ollama_fib():
@@ -106,17 +117,10 @@ async def shutdown_event():
     await tilly.close()
 
 
-@app.get("/")
-async def root():
-    """Welcome endpoint"""
-    return {
-        "message": "Hello! I'm Tilly, your AI companion. I'm here to listen and support you.",
-        "version": "1.0.0",
-        "endpoints": {
-            "chat": "/chat",
-            "health": "/health"
-        }
-    }
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    """Serve the web UI"""
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/chat", response_model=ChatResponse)

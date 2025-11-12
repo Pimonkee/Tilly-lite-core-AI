@@ -5,7 +5,7 @@ Analyzes incoming text and determines the user's intent with surgical precision.
 
 import re
 from typing import Dict, Set
-from tilly_conversation_context import TillyContext, IntentType
+from src.tilly.core.tilly_conversation_context import TillyContext, IntentType
 import logging
 
 logger = logging.getLogger(__name__)

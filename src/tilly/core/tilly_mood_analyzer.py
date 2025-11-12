@@ -4,7 +4,7 @@ Reads the emotional undertones in human communication with unprecedented accurac
 """
 
 from typing import Dict, Any
-from tilly_conversation_context import TillyContext, MoodState
+from src.tilly.core.tilly_conversation_context import TillyContext, MoodState
 import logging
 
 logger = logging.getLogger(__name__)
