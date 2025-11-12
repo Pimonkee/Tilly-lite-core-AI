@@ -11,8 +11,8 @@ except Exception:
 from typing import List, Optional, Dict, Any
 from abc import ABC, abstractmethod
 import logging
-from tilly_configuration_manager3 import ModelConfig, TillyConfigManager
-from tilly_conversation_context import TillyContext
+from src.tilly.config.configuration_manager import ModelConfig, TillyConfigManager
+from src.tilly.core.tilly_conversation_context import TillyContext
 
 logger = logging.getLogger(__name__)
 

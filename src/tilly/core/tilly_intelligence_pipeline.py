@@ -5,10 +5,10 @@ Where all the magic comes together into one coherent AI companion.
 
 import logging
 from typing import List
-from tilly_conversation_context import TillyContext, IntentType
-from tilly_intent_router import TillyRouter
-from tilly_mood_analyzer import TillyMoodDetector
-from tilly_l_l_m_provider_manager import TillyBrain
+from src.tilly.core.tilly_conversation_context import TillyContext, IntentType
+from src.tilly.core.tilly_intent_router import TillyRouter
+from src.tilly.core.tilly_mood_analyzer import TillyMoodDetector
+from src.tilly.core.tilly_l_l_m_provider_manager import TillyBrain
 
 logger = logging.getLogger(__name__)
 

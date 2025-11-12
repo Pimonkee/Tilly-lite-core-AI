@@ -1,0 +1,59 @@
+# Tilly AI - Core Dependencies
+# Python 3.9+ required
+
+# Web Framework & API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+aiohttp==3.9.1
+
+# Data Models & Validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Configuration & Environment
+python-dotenv==1.0.0
+pyyaml==6.0.1
+click==8.1.7
+
+# Database
+sqlalchemy==2.0.23
+aiosqlite==0.19.0
+
+# AI/ML & LLM Integration
+# Note: Add your preferred LLM provider SDKs as needed
+# google-generativeai  # For Gemini
+# openai               # For OpenAI
+# anthropic            # For Claude
+
+# OCR & Image Processing
+pytesseract==0.3.10
+Pillow==10.1.0
+
+# Natural Language Processing
+# rasa==3.6.13  # Optional - only if using Rasa features
+
+# Logging & Monitoring
+colorlog==6.8.0
+
+# Utilities
+requests==2.31.0
+httpx==0.25.2
+tenacity==8.2.3  # For retry logic
+
+# Development Dependencies (optional)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.12.1
+flake8==6.1.0
+mypy==1.7.1
+isort==5.13.2
+
+# Security
+cryptography==41.0.7
+
+# Additional utilities
+rich==13.7.0  # For beautiful terminal output
+watchdog==3.0.0  # For file watching
+schedule==1.2.0  # For scheduling tasks
