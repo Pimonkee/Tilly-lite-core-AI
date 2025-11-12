@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  tilly:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TILLY_ENV=production
+      - TILLY_LOG_LEVEL=INFO
+      - TILLY_DATA_ROOT=/app/data
+      - TILLY_PRIMARY_PROVIDER=${TILLY_PRIMARY_PROVIDER:-gemini}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - TILLY_TEMPERATURE=${TILLY_TEMPERATURE:-0.7}
+      - TILLY_MAX_TOKENS=${TILLY_MAX_TOKENS:-1024}
+    volumes:
+      - tilly_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  tilly_data:
+    driver: local
