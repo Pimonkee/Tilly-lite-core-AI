@@ -18,6 +18,17 @@ class TillyApp {
         this.newChatBtn = document.getElementById('newChatBtn');
         this.welcomeScreen = document.getElementById('welcomeScreen');
         this.statusIndicator = document.getElementById('statusIndicator');
+        
+        // Vision elements
+        this.visionBtn = document.getElementById('visionBtn');
+        this.videoContainer = document.getElementById('videoContainer');
+        this.videoFeed = document.getElementById('videoFeed');
+        this.visionActive = false;
+        this.visionInterval = null;
+        
+        // Audio elements
+        this.audioBtn = document.getElementById('audioBtn');
+        this.audioActive = false;
     }
 
     initEventListeners() {
@@ -50,6 +61,16 @@ class TillyApp {
                 this.sendMessage();
             });
         });
+        
+        // Vision button
+        if (this.visionBtn) {
+            this.visionBtn.addEventListener('click', () => this.toggleVision());
+        }
+        
+        // Audio button
+        if (this.audioBtn) {
+            this.audioBtn.addEventListener('click', () => this.toggleAudio());
+        }
     }
 
     autoResizeTextarea() {
@@ -338,6 +359,121 @@ class TillyApp {
         this.messageInput.value = '';
         this.messageInput.style.height = 'auto';
         this.sendBtn.disabled = true;
+    }
+    
+    // Computer Vision Methods
+    async toggleVision() {
+        if (this.visionActive) {
+            await this.stopVision();
+        } else {
+            await this.startVision();
+        }
+    }
+    
+    async startVision() {
+        try {
+            const response = await fetch('/vision/start', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                this.visionActive = true;
+                this.visionBtn.classList.add('active');
+                this.videoContainer.classList.add('active');
+                
+                // Start capturing frames
+                this.visionInterval = setInterval(() => this.captureFrame(), 100);
+                
+                console.log('Camera started successfully');
+            } else {
+                throw new Error('Failed to start camera');
+            }
+        } catch (error) {
+            console.error('Error starting camera:', error);
+            alert('Failed to start camera. Please check permissions and try again.');
+        }
+    }
+    
+    async stopVision() {
+        try {
+            const response = await fetch('/vision/stop', { method: 'POST' });
+            const data = await response.json();
+            
+            if (this.visionInterval) {
+                clearInterval(this.visionInterval);
+                this.visionInterval = null;
+            }
+            
+            this.visionActive = false;
+            this.visionBtn.classList.remove('active');
+            this.videoContainer.classList.remove('active');
+            
+            console.log('Camera stopped');
+        } catch (error) {
+            console.error('Error stopping camera:', error);
+        }
+    }
+    
+    async captureFrame() {
+        if (!this.visionActive) return;
+        
+        try {
+            const response = await fetch('/vision/capture');
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.image) {
+                this.videoFeed.src = 'data:image/jpeg;base64,' + data.image;
+            }
+        } catch (error) {
+            console.error('Error capturing frame:', error);
+        }
+    }
+    
+    // Audio/Voice Methods
+    async toggleAudio() {
+        if (this.audioActive) {
+            this.stopAudio();
+        } else {
+            await this.startAudioConversation();
+        }
+    }
+    
+    async startAudioConversation() {
+        try {
+            this.audioActive = true;
+            this.audioBtn.classList.add('active');
+            this.audioBtn.disabled = true;
+            
+            // Add listening indicator
+            this.addMessage('tilly', '🎤 Listening... Please speak now.');
+            
+            const response = await fetch('/audio/conversation', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Display what the user said
+                this.addMessage('user', data.user_text);
+                
+                // Display Tilly's response
+                this.addMessage('tilly', data.response, {
+                    intent: data.intent,
+                    mood: data.mood
+                });
+            } else if (data.status === 'no_speech') {
+                this.addMessage('tilly', '🔇 No speech detected. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error in audio conversation:', error);
+            this.addMessage('tilly', '❌ Audio conversation failed. Please check your microphone permissions.');
+        } finally {
+            this.audioActive = false;
+            this.audioBtn.classList.remove('active');
+            this.audioBtn.disabled = false;
+        }
+    }
+    
+    stopAudio() {
+        this.audioActive = false;
+        this.audioBtn.classList.remove('active');
     }
 }
 

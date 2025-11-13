@@ -500,6 +500,123 @@ body {
     }
 }
 
+/* Vision and Audio Controls */
+.feature-controls {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--sidebar-bg);
+}
+
+.feature-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--background);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.feature-btn:hover {
+    background: var(--message-bg);
+    border-color: var(--primary-color);
+}
+
+.feature-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.feature-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 16px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow);
+    display: none;
+}
+
+.video-container.active {
+    display: block;
+}
+
+.video-feed {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.vision-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vision-status.active::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+}
+
+.audio-controls {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    justify-content: center;
+}
+
+.audio-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--message-bg);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.audio-indicator.listening::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    animation: pulse 1s ease infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
     * {

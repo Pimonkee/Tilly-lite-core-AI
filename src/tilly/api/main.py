@@ -16,6 +16,8 @@ from src.tilly.config.configuration_manager import get_config
 from src.tilly.config.tilly_path_management import DATA_ROOT, get_log_path, ensure_data_dirs
 from src.tilly.utils.ocr import process_image, remember_text, memory, batch_process_folder
 from src.tilly.utils.ollama_client import generate_with_ollama
+from src.tilly.utils.computer_vision import get_vision_instance
+from src.tilly.utils.audio_handler import get_audio_instance
 
 # Get the project root directory
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
@@ -229,6 +231,172 @@ def tilly_perform_action():
     except Exception as e:
         logger.error(f"/tilly/action error: {e}")
         raise HTTPException(status_code=500, detail="Failed to perform action")
+
+
+# Computer Vision Endpoints
+@app.post("/vision/start")
+async def start_vision():
+    """Start the computer vision camera"""
+    try:
+        cv = get_vision_instance()
+        success = cv.start_camera()
+        if success:
+            return {"status": "success", "message": "Camera started"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to start camera")
+    except Exception as e:
+        logger.error(f"Error starting camera: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/vision/stop")
+async def stop_vision():
+    """Stop the computer vision camera"""
+    try:
+        cv = get_vision_instance()
+        cv.stop_camera()
+        return {"status": "success", "message": "Camera stopped"}
+    except Exception as e:
+        logger.error(f"Error stopping camera: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/vision/capture")
+async def capture_frame():
+    """Capture a single frame from the camera"""
+    try:
+        cv = get_vision_instance()
+        frame = cv.capture_frame()
+        if frame is None:
+            raise HTTPException(status_code=400, detail="No frame captured. Is camera started?")
+        
+        # Detect faces
+        faces = cv.detect_faces(frame)
+        
+        # Annotate frame with face rectangles
+        if faces:
+            frame = cv.annotate_frame(frame, faces)
+        
+        # Convert to base64
+        base64_image = cv.frame_to_base64(frame)
+        if base64_image is None:
+            raise HTTPException(status_code=500, detail="Failed to encode frame")
+        
+        return {
+            "status": "success",
+            "image": base64_image,
+            "faces_detected": len(faces),
+            "faces": faces
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error capturing frame: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/vision/chat")
+async def vision_chat(request: ChatRequest):
+    """
+    Chat with Tilly using computer vision context
+    Captures current camera frame and includes it in the conversation
+    """
+    try:
+        cv = get_vision_instance()
+        frame = cv.capture_frame()
+        
+        # Enhance the message with vision context
+        vision_context = ""
+        if frame is not None:
+            faces = cv.detect_faces(frame)
+            if faces:
+                vision_context = f"\n[Vision Context: I can see {len(faces)} face(s) in the camera]"
+            else:
+                vision_context = "\n[Vision Context: Camera is active but no faces detected]"
+        else:
+            vision_context = "\n[Vision Context: No camera feed available]"
+        
+        # Process through Tilly pipeline with vision context
+        enhanced_message = request.message + vision_context
+        response, context = await tilly.process(enhanced_message, request.session_id)
+        
+        return ChatResponse(
+            response=response,
+            session_id=context.session_id,
+            intent=context.intent.value,
+            mood=context.mood.value,
+            model_used=context.model_used or "unknown"
+        )
+    except Exception as e:
+        logger.error(f"Vision chat error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Audio/Speech Endpoints
+@app.post("/audio/listen")
+async def listen_audio():
+    """Listen for speech and convert to text"""
+    try:
+        audio = get_audio_instance()
+        text = audio.listen_once(timeout=5, phrase_time_limit=10)
+        
+        if text:
+            return {"status": "success", "text": text}
+        else:
+            return {"status": "no_speech", "text": None}
+    except Exception as e:
+        logger.error(f"Error listening to audio: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/audio/speak")
+async def speak_audio(text: str):
+    """Convert text to speech and play it"""
+    try:
+        audio = get_audio_instance()
+        success = audio.speak(text, use_online=False)
+        
+        if success:
+            return {"status": "success", "message": "Speech completed"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate speech")
+    except Exception as e:
+        logger.error(f"Error speaking audio: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/audio/conversation")
+async def audio_conversation():
+    """
+    Live conversation: Listen for speech, process with Tilly, and respond with speech
+    """
+    try:
+        audio = get_audio_instance()
+        
+        # Listen for user input
+        user_text = audio.listen_once(timeout=5, phrase_time_limit=10)
+        if not user_text:
+            return {"status": "no_speech", "message": "No speech detected"}
+        
+        logger.info(f"User said: {user_text}")
+        
+        # Process through Tilly
+        response, context = await tilly.process(user_text, None)
+        
+        # Speak the response
+        audio.speak(response, use_online=False)
+        
+        return {
+            "status": "success",
+            "user_text": user_text,
+            "response": response,
+            "session_id": context.session_id,
+            "intent": context.intent.value,
+            "mood": context.mood.value
+        }
+    except Exception as e:
+        logger.error(f"Audio conversation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

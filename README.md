@@ -52,6 +52,8 @@ Tilly is an advanced AI companion designed with empathy at its core. Unlike trad
 - 💬 **Context-Aware Conversations**: Maintains conversation history and context
 - 🖼️ **OCR Integration**: Extract and process text from images
 - 📊 **Health Monitoring**: Built-in health checks for all components
+- 👁️ **Computer Vision**: Real-time webcam integration with face detection
+- 🎤 **Live Voice Conversations**: Speech-to-text and text-to-speech for natural interactions
 
 ### Technical Features
 
@@ -61,6 +63,8 @@ Tilly is an advanced AI companion designed with empathy at its core. Unlike trad
 - 📈 **Scalable Architecture**: Modular design for easy extension
 - 🐳 **Container Ready**: Easy deployment with Docker
 - 📝 **Comprehensive Logging**: Detailed logs for debugging and monitoring
+- 📹 **Video Streaming**: Real-time camera feed in web interface
+- 🗣️ **Audio Processing**: Speech recognition and synthesis
 
 ---
 
@@ -284,7 +288,181 @@ Upload image for OCR processing
 }
 ```
 
+#### `POST /vision/start`
+
+Start the computer vision camera
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Camera started"
+}
+```
+
+#### `POST /vision/stop`
+
+Stop the computer vision camera
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Camera stopped"
+}
+```
+
+#### `GET /vision/capture`
+
+Capture a single frame from the camera with face detection
+
+**Response:**
+```json
+{
+  "status": "success",
+  "image": "base64_encoded_image_data",
+  "faces_detected": 2,
+  "faces": [[x, y, w, h], ...]
+}
+```
+
+#### `POST /vision/chat`
+
+Chat with Tilly using computer vision context
+
+**Request:**
+```json
+{
+  "message": "What do you see?",
+  "session_id": "optional-session-id"
+}
+```
+
+**Response:**
+```json
+{
+  "response": "I can see 2 faces in the camera...",
+  "session_id": "session-id",
+  "intent": "chat",
+  "mood": "neutral",
+  "model_used": "gemini-pro"
+}
+```
+
+#### `POST /audio/listen`
+
+Listen for speech and convert to text
+
+**Response:**
+```json
+{
+  "status": "success",
+  "text": "Hello Tilly"
+}
+```
+
+#### `POST /audio/speak`
+
+Convert text to speech and play it
+
+**Parameters:** `text` (string)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Speech completed"
+}
+```
+
+#### `POST /audio/conversation`
+
+Live conversation: Listen, process with Tilly, and respond with speech
+
+**Response:**
+```json
+{
+  "status": "success",
+  "user_text": "Hello Tilly",
+  "response": "Hello! How are you?",
+  "session_id": "session-id",
+  "intent": "chat",
+  "mood": "positive"
+}
+```
+
 For complete API documentation, visit `/docs` when running the application.
+
+---
+
+## 🎥 Using Computer Vision and Voice Features
+
+### Computer Vision
+
+Tilly now supports real-time computer vision through your webcam:
+
+1. **Start the Application**: Run `python run.py`
+2. **Open the Web UI**: Navigate to `http://localhost:8000/`
+3. **Click the Camera Button**: In the web interface, click the 📹 Camera button
+4. **Grant Permissions**: Allow camera access when prompted by your browser
+5. **View the Feed**: You'll see a live video feed with face detection
+6. **Chat with Vision**: Messages sent while camera is active include vision context
+
+**Features:**
+- Real-time face detection using Haar Cascades
+- Vision-enhanced conversations (Tilly knows what she sees)
+- Easy on/off toggle
+- Works entirely in the browser
+
+### Live Voice Conversations
+
+Have natural voice conversations with Tilly:
+
+1. **Click the Voice Button**: Click the 🎤 Voice button in the web interface
+2. **Grant Microphone Permissions**: Allow microphone access when prompted
+3. **Speak Your Message**: Tilly will listen for 5-10 seconds
+4. **Get Audio Response**: Tilly will respond both as text and speech
+
+**Requirements:**
+- Microphone access
+- Internet connection for Google Speech Recognition
+- Audio output (speakers/headphones)
+
+**Offline Option:**
+The system uses `pyttsx3` for offline text-to-speech. No internet required for responses!
+
+### API Usage Examples
+
+#### Vision Chat with cURL
+
+```bash
+# Start the camera
+curl -X POST http://localhost:8000/vision/start
+
+# Capture a frame
+curl http://localhost:8000/vision/capture
+
+# Chat with vision context
+curl -X POST http://localhost:8000/vision/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What do you see?"}'
+
+# Stop the camera
+curl -X POST http://localhost:8000/vision/stop
+```
+
+#### Voice Conversation with Python
+
+```python
+import requests
+
+# Start a voice conversation
+response = requests.post('http://localhost:8000/audio/conversation')
+data = response.json()
+
+print(f"You said: {data['user_text']}")
+print(f"Tilly responded: {data['response']}")
+```
 
 ---
 
